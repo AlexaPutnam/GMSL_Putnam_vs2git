@@ -8,6 +8,8 @@ Created on Thu Mar 31 10:18:14 2022
 import xarray as xr
 import numpy as np
 
+LOCDIR = '/Users/alexaputnam/GMSL/web_gmsl/'
+
 def tdm_out(FN,MEAN=True,MINCYC=[]):
     ds = xr.open_dataset(FN,decode_times=False)
     dsla = ds.sla_gia.data[:,0] #!!! sla or sla_gia # output = (N,4). Columns are mean, std, min, max 
@@ -33,10 +35,10 @@ def tdm_out(FN,MEAN=True,MINCYC=[]):
 
 
 def IMBias_relTX():
-    FN1 = 'radsstat4/txj1_stat.nc'
-    FN2 = 'radsstat4/j1j2_stat.nc'
-    FN3 = 'radsstat4/j2j3_stat.nc'
-    FN4 = 'radsstat4/j3s6_stat.nc'
+    FN1 = LOCDIR+'radsstat4/txj1_stat.nc'
+    FN2 = LOCDIR+'radsstat4/j1j2_stat.nc'
+    FN3 = LOCDIR+'radsstat4/j2j3_stat.nc'
+    FN4 = LOCDIR+'radsstat4/j3s6_stat.nc'
     dc = 18
     btj,stj = tdm_out(FN1,MEAN=True,MINCYC=dc)
     b12,s12 = tdm_out(FN2,MEAN=True,MINCYC=dc)
@@ -100,7 +102,7 @@ def IMBias_relTX():
     plt.title('J3/S6A. IMB = '+str(imb_js)+'$\pm$'+str(sd_js)+' mm')
     plt.xlabel('Cycle number of successor')
     plt.ylabel('dMSL [mm]')
-    fig.savefig('validation/gmsl_2022rel3_rads_col_diff.png')
+    fig.savefig(LOCDIR+'validation/gmsl_2022rel3_rads_col_diff.png')
     return imb_tj,imb_12,imb_23,imb_js
 
 def biases():
@@ -111,11 +113,11 @@ def biases():
     return im_biases
 
 def append_ts(MNS,TDM=False):
-    FN1 = 'radsstat4/tx_stat.nc'
-    FN2 = 'radsstat4/j1_stat.nc'
-    FN3 = 'radsstat4/j2_stat.nc'
-    FN4 = 'radsstat4/j3_stat.nc'
-    FN5 = 'radsstat4/6a_stat.nc'
+    FN1 = LOCDIR+'radsstat4/tx_stat.nc'
+    FN2 = LOCDIR+'radsstat4/j1_stat.nc'
+    FN3 = LOCDIR+'radsstat4/j2_stat.nc'
+    FN4 = LOCDIR+'radsstat4/j3_stat.nc'
+    FN5 = LOCDIR+'radsstat4/6a_stat.nc'
     nr_min = 300000.0
     bias4 = biases()
     print('biases [tx-j1, j1-j2, j2-j3, j3-s6a: '+str(bias4))
@@ -133,10 +135,10 @@ def append_ts(MNS,TDM=False):
             cycle = []
             # Call Topex data
             ds = xr.open_dataset(FN1,decode_times=False)
-            ds_temp = xr.open_dataset('extras/tx_CoG.nc')
+            ds_temp = xr.open_dataset(LOCDIR+'extras/tx_CoG.nc')
             tx_cog = (ds_temp.sla.data[:,0] - ds_temp.sla_nocg.data[:,0])
             cyc_cog = ds_temp.cycle.data
-            ds_temp = xr.open_dataset('extras/tx_ptr_cal1.nc')
+            ds_temp = xr.open_dataset(LOCDIR+'extras/tx_ptr_cal1.nc')
             cal1_array = ds_temp.drange_cal1.data[:,0]
             ku_array = ds_temp.drange_ku.data[:,0]
             cyc_ptr = ds_temp.cycle.data

@@ -12,6 +12,8 @@ from matplotlib import pyplot as plt
 import lib_timeseries as lts
 import lib_external as lex
 
+LOCDIR = '/Users/alexaputnam/GMSL/web_gmsl/'
+
 #################################################################
 #################################################################
 #################################################################
@@ -240,17 +242,17 @@ def validate_tandem_match(t,sla,tag,FN):
 #################################################################
 ## Make timeseries for website
 t,cycle,nr,sla,tag,bias4 = lts.append_ts(MNS,TDM=False)
-np.savez('radsstat4/gmsl_rads_appended.npz', t=t,gmsl=sla,tag=tag,cycle=cycle,biases=bias4,nr=nr)
+np.savez(LOCDIR+'radsstat4/gmsl_rads_appended.npz', t=t,gmsl=sla,tag=tag,cycle=cycle,biases=bias4,nr=nr)
 ## Make timeseries for tandem analysis (validation)
 t2,cycle2,nr2,sla2,tag2,bias42 = lts.append_ts(MNS,TDM=True)
-np.savez('radsstat4/gmsl_rads_appended_tandem.npz', t=t2,gmsl=sla2,tag=tag2,cycle=cycle2,biases=bias42,nr=nr2)
+np.savez(LOCDIR+'radsstat4/gmsl_rads_appended_tandem.npz', t=t2,gmsl=sla2,tag=tag2,cycle=cycle2,biases=bias42,nr=nr2)
 
 
 #################################################################
 #################################################################
 #################################################################
 # Analyze timeseries
-file = np.load('radsstat4/gmsl_rads_appended.npz')
+file = np.load(LOCDIR+'radsstat4/gmsl_rads_appended.npz')
 t,gmsl,tag,c_file = file.f.t,file.f.gmsl,file.f.tag,file.f.cycle
 im_biases,nr = file.f.biases,file.f.nr
 t = np.round(t,3)
@@ -263,7 +265,7 @@ data2web(t,gmsl,tag,c_file,im_biases,nr)
 ## Validate
 if VALIDATE == True:
     
-    file = np.load('radsstat4/gmsl_rads_appended_tandem.npz')
+    file = np.load(LOCDIR+'radsstat4/gmsl_rads_appended_tandem.npz')
     t,gmsl,tag,c_file = file.f.t,file.f.gmsl,file.f.tag,file.f.cycle
     im_biases,nr = file.f.biases,file.f.nr
     t = np.round(t,3)
@@ -332,8 +334,8 @@ if VALIDATE == True:
     gmsl_smooth = lts.smooth(t,gmsl,window=7)
     gmsl_ds_smooth = lts.smooth(t,gmsl_ds,window=7)
     
-    validate_cu_noaa_goddard('validation/gmsl_2022rel1_seasons_retained_external_comparison.png')
-    validate_tandem_match(t,gmsl,tag,'validation/gmsl_2022rel1_seasons_retained_tandem_phase.png')
+    validate_cu_noaa_goddard(LOCDIR+'validation/gmsl_2022rel1_seasons_retained_external_comparison.png')
+    validate_tandem_match(t,gmsl,tag,LOCDIR+'validation/gmsl_2022rel1_seasons_retained_tandem_phase.png')
 
     
 '''

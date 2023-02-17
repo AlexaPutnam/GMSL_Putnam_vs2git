@@ -11,10 +11,11 @@ from netCDF4 import Dataset
 
 import lib_timeseries as lts
 
+LOCDIR = '/Users/alexaputnam/GMSL/web_gmsl/'
 
 def gmsl_noaa():
     # https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/LSA_SLR_timeseries.php
-    ds=Dataset('external/slr_sla_gbl_free_txj1j2_90.nc')
+    ds=Dataset(LOCDIR+'external/slr_sla_gbl_free_txj1j2_90.nc')
     tt = ds['time_tx'][:]
     ht = ds['sla_tx'][:]
     t1 = ds['time_j1'][:][ds['time_j1'][:]>np.nanmax(tt)]
@@ -36,7 +37,7 @@ def gmsl_noaa():
     return t,gmsl_smooth,rate,accel
     
 def gmsl_goddard():
-    text_array = np.loadtxt('external/gmsl_goddard.txt',delimiter=' ',dtype=object) #108,323,355
+    text_array = np.loadtxt(LOCDIR+'external/gmsl_goddard.txt',delimiter=' ',dtype=object) #108,323,355
     df = np.array([np.float(x) for x in text_array[:, 0]])#np.array(text_array[:, 0])
     cyc = np.array([np.float(x) for x in text_array[:, 1]])#np.array(text_array[:, 1])
     t = np.array([np.float(x) for x in text_array[:, 2]])#np.array(text_array[:, 2])

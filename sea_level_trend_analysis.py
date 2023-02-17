@@ -16,6 +16,8 @@ from matplotlib import colors
 
 import lib_external as lex
 
+LOCDIR = '/Users/alexaputnam/GMSL/web_gmsl/'
+
 
 ###########################################################################  
 ## Functions
@@ -48,7 +50,7 @@ def deseason(t,timeseries):
 
 def mask_out_land(xref_mesh,yref_mesh):
     ### make mask using elev.1-deg.nc to remove land###
-    ds = xr.open_dataset('extras/elev.1-deg.nc',decode_times=False)
+    ds = xr.open_dataset(LOCDIR+'extras/elev.1-deg.nc',decode_times=False)
     mask_vals = ds.data.data.squeeze()
     mask_lon = ds.lon.data
     mask_lat = ds.lat.data
@@ -67,7 +69,7 @@ def mask_out_land(xref_mesh,yref_mesh):
 
 def mask_out_land_4plot(xref_mesh,yref_mesh):
     ### make mask using elev.1-deg.nc to remove land###
-    ds = xr.open_dataset('extras/elev.1-deg.nc',decode_times=False)
+    ds = xr.open_dataset(LOCDIR+'extras/elev.1-deg.nc',decode_times=False)
     mask_vals = ds.data.data.squeeze()
     mask_lon = ds.lon.data
     mask_lat = ds.lat.data
@@ -88,16 +90,16 @@ def mask_out_land_4plot(xref_mesh,yref_mesh):
 def create_spatial_timeseries(filenames):
     from netCDF4 import Dataset
     Nf = np.shape(filenames)[0]
-    ds_temp = xr.open_dataset('grids4trend/tx_grids_15.nc')
+    ds_temp = xr.open_dataset(LOCDIR+'grids4trend/tx_grids_15.nc')
     xref = ds_temp.lon.data
     yref = ds_temp.lat.data
     xref_mesh,yref_mesh = np.meshgrid(xref,yref)
     ### Create land mask
     mask = mask_out_land(xref_mesh,yref_mesh)
     # skip these cycles
-    skip_name1 = 'grids4trend/j2_grids_174.nc'
-    skip_name2 = 'grids4trend/j2_grids_175.nc'
-    skip_name3 = 'grids4trend/j3_grids_197.nc'
+    skip_name1 = LOCDIR+'grids4trend/j2_grids_174.nc'
+    skip_name2 = LOCDIR+'grids4trend/j2_grids_175.nc'
+    skip_name3 = LOCDIR+'grids4trend/j3_grids_197.nc'
     # find gridded timeseries
     mission_temp = []
     cycle_temp = []
@@ -153,11 +155,11 @@ def create_spatial_timeseries(filenames):
 
 def txA_corrections(cycle,mission,sla):
     # CoG
-    ds_temp = xr.open_dataset('extras/tx_CoG.nc')
+    ds_temp = xr.open_dataset(LOCDIR+'extras/tx_CoG.nc')
     tx_cog = (ds_temp.sla.data[:,0] - ds_temp.sla_nocg.data[:,0])
     cyc_cog = ds_temp.cycle.data
     # CAL1
-    ds_temp = xr.open_dataset('extras/tx_ptr_cal1.nc')
+    ds_temp = xr.open_dataset(LOCDIR+'extras/tx_ptr_cal1.nc')
     cal1_array = ds_temp.drange_cal1.data[:,0]
     ku_array = ds_temp.drange_ku.data[:,0]
     cyc_ptr = ds_temp.cycle.data
@@ -226,11 +228,11 @@ def plot_sl_trends(xref,yref,rads,t,vmin=-4,vmax=8,cmap='jet',TITLE=[],clab='mm/
     gl.xformatter = LONGITUDE_FORMATTER; gl.yformatter = LATITUDE_FORMATTER
     # save figure
     if np.size(TITLE)==0:
-        plt.savefig('output_4_website/cu_sea_level_trends.png',dpi=300,bbox_inches='tight')#,dpi=300, bbox_inches="tight",pad_inches = 0.3)
-        plt.savefig('output_4_website/cu_sea_level_trends.pdf',dpi=300)
-        plt.savefig('output_4_website/cu_sea_level_trends.eps',dpi=300)
+        plt.savefig(LOCDIR+'output_4_website/cu_sea_level_trends.png',dpi=300,bbox_inches='tight')#,dpi=300, bbox_inches="tight",pad_inches = 0.3)
+        plt.savefig(LOCDIR+'output_4_website/cu_sea_level_trends.pdf',dpi=300)
+        plt.savefig(LOCDIR+'output_4_website/cu_sea_level_trends.eps',dpi=300)
     else:
-        plt.savefig('validation/cu_vs_noaa_sea_level_trends.png',dpi=300,bbox_inches='tight')
+        plt.savefig(LOCDIR+'validation/cu_vs_noaa_sea_level_trends.png',dpi=300,bbox_inches='tight')
     plt.show()
 
 def plot_sl_trends_simple(xref,yref,rads,t,vmin=-4,vmax=8,cmap='jet',TITLE=[],clab='mm/year'):
@@ -263,18 +265,18 @@ def plot_sl_trends_simple(xref,yref,rads,t,vmin=-4,vmax=8,cmap='jet',TITLE=[],cl
     gl.xformatter = LONGITUDE_FORMATTER; gl.yformatter = LATITUDE_FORMATTER
     # save figure
     if np.size(TITLE)==0:
-        plt.savefig('output_4_website/cu_sea_level_trends.png',dpi=300,bbox_inches='tight')#,dpi=300, bbox_inches="tight",pad_inches = 0.3)
-        plt.savefig('output_4_website/cu_sea_level_trends.pdf',dpi=300)
-        plt.savefig('output_4_website/cu_sea_level_trends.eps',dpi=300)
+        plt.savefig(LOCDIR+'output_4_website/cu_sea_level_trends.png',dpi=300,bbox_inches='tight')#,dpi=300, bbox_inches="tight",pad_inches = 0.3)
+        plt.savefig(LOCDIR+'output_4_website/cu_sea_level_trends.pdf',dpi=300)
+        plt.savefig(LOCDIR+'output_4_website/cu_sea_level_trends.eps',dpi=300)
     else:
-        plt.savefig('validation/cu_vs_noaa_sea_level_trends.png',dpi=300,bbox_inches='tight')
+        plt.savefig(LOCDIR+'validation/cu_vs_noaa_sea_level_trends.png',dpi=300,bbox_inches='tight')
     plt.show()
 
 ###########################################################################  
 ## Create gridded SL trend dataset
 ###########################################################################
 ### Create timeseries
-filenames = glob('grids4trend/*.nc')
+filenames = glob(LOCDIR+'grids4trend/*.nc')
 cycle,mission,sla_ucTxA,timeT,xref,yref = create_spatial_timeseries(filenames)
 ### Define map parameters
 xref_mesh,yref_mesh = np.meshgrid(xref,yref)
@@ -298,7 +300,7 @@ plt.plot(timeT,sla_lagos)
 '''
 
 # save trends
-np.savez('rads_trends_uninterp.npz',lon=lon,lat=yref,trends=trends_rolled,t=timeT)
+np.savez(LOCDIR+'rads_trends_uninterp.npz',lon=lon,lat=yref,trends=trends_rolled,t=timeT)
 
 ######
 # Sanity Checks
@@ -377,7 +379,7 @@ yref = np.arange(-90+(dx/2),90-(dx/2)+dx,dx)
 xref_mesh,yref_mesh = np.meshgrid(xref,yref)
 
 # open file created in main.py
-file = np.load('rads_trends_uninterp.npz')
+file = np.load(LOCDIR+'rads_trends_uninterp.npz')
 rads_temp = file.f.trends
 lon = file.f.lon
 lat = file.f.lat
@@ -413,10 +415,10 @@ plot_sl_trends(xref,yref,rads,timeT)
 plot_sl_trends_simple(xref,yref,rads*30.,timeT,TITLE='30 year projection',clab='mm',vmin=-100,vmax=200)
 
 # save map to npz file
-np.savez('final_map_data.npz',lat=yref,lon=xref,trends = rads)
+np.savez(LOCDIR+'final_map_data.npz',lat=yref,lon=xref,trends = rads)
 
 # save map to netCDF file 
-ds = nc.Dataset('output_4_website/cu_sea_level_trends.nc','w',format='NETCDF4')
+ds = nc.Dataset(LOCDIR+'output_4_website/cu_sea_level_trends.nc','w',format='NETCDF4')
 ds.description = 'University of Colorado Sea Level Trends 2021_rel1 (1992.96 - 2022.60)'
 lat = ds.createDimension('lat',len(yref))
 lon = ds.createDimension('lon',len(xref))
@@ -432,7 +434,7 @@ ds.close()
 ############################################################################
 ### Validation
 # cu uses lon[0,360], noaa uses[-180,180] 
-ds_noaa = nc.Dataset('external/slr_map_txj1j2.nc')
+ds_noaa = nc.Dataset(LOCDIR+'external/slr_map_txj1j2.nc')
 slt_noaa = ds_noaa['Sea_level_trends'][:].data # (340, 720)
 lat_noaa = ds_noaa['lat'][:].data # 340
 lon_noaa = ds_noaa['lon'][:].data # 720
