@@ -17,7 +17,11 @@ from matplotlib import colors
 import lib_external as lex
 
 LOCDIR = '/Users/alexaputnam/GMSL/web_gmsl/'
-
+G4T = 'grids4trend_alexa/'#'grids4trend/' # test different grid files'
+if G4T == 'grids4trend_alexa/':
+    INST = '_grids_newSSB_'
+else:
+    INST = '_grids_'
 
 ###########################################################################  
 ## Functions
@@ -90,16 +94,16 @@ def mask_out_land_4plot(xref_mesh,yref_mesh):
 def create_spatial_timeseries(filenames):
     from netCDF4 import Dataset
     Nf = np.shape(filenames)[0]
-    ds_temp = xr.open_dataset(LOCDIR+'grids4trend/tx_grids_15.nc')
+    ds_temp = xr.open_dataset(LOCDIR+G4T+'tx'+INST+'15.nc')
     xref = ds_temp.lon.data
     yref = ds_temp.lat.data
     xref_mesh,yref_mesh = np.meshgrid(xref,yref)
     ### Create land mask
     mask = mask_out_land(xref_mesh,yref_mesh)
     # skip these cycles
-    skip_name1 = LOCDIR+'grids4trend/j2_grids_174.nc'
-    skip_name2 = LOCDIR+'grids4trend/j2_grids_175.nc'
-    skip_name3 = LOCDIR+'grids4trend/j3_grids_197.nc'
+    skip_name1 = LOCDIR+G4T+'j2'+INST+'174.nc'
+    skip_name2 = LOCDIR+G4T+'j2'+INST+'175.nc'
+    skip_name3 = LOCDIR+G4T+'j3'+INST+'197.nc'
     # find gridded timeseries
     mission_temp = []
     cycle_temp = []
@@ -111,7 +115,7 @@ def create_spatial_timeseries(filenames):
         # open SL file
         ds = Dataset(filenames[ii])
         ds = xr.open_dataset(filenames[ii])
-        igd = np.where(~np.isnan(ds.sla_mean.data))
+        igd = np.where(~np.isnan(ds.sla_gia_mean.data))
         # make sure file is valid
         if np.isnan(np.nanmin(ds.time_mean.data)) or np.size(igd)==0: 
             mission_temp.append(999)
@@ -122,15 +126,19 @@ def create_spatial_timeseries(filenames):
         tmax = conv_datetime(np.nanmax(ds.time_mean.data[igd]))
         t[ii] = (tmin + tmax)/2
         # save mission name and cycle number
-        mission_temp.append(ds.title[12:14])
-        cycle_temp.append(int(ds.title[21:-3]))
+        if G4T=='grids4trend/':
+            i11,i12,i21,i22=12,14,21,-3
+        elif G4T=='grids4trend_alexa/':
+            i11,i12,i21,i22=12+7,14+7,21+14,-3
+        mission_temp.append(ds.title[i11:i12])
+        cycle_temp.append(int(ds.title[i21:i22]))
         # mIf the file needs to be skipped then set to NaN
         if np.logical_or(np.logical_or(filenames[ii] == skip_name1,filenames[ii] == skip_name2),filenames[ii]==skip_name3): #######
             sla_temp[ii,:,:] = np.NaN                                             #######
             xr.Dataset.close(ds)                                                 #######
             continue                                                             #######
         # remove GIA and save SLA
-        sla_temp[ii,:,:] = mask*(ds.sla_mean.data.T)# + ds.gia_mean.data.T)
+        sla_temp[ii,:,:] = mask*(ds.sla_gia_mean.data.T)# + ds.gia_mean.data.T)
         xr.Dataset.close(ds)
     # Make sure the data is in chronological order
     args = np.argsort(t)
@@ -276,7 +284,7 @@ def plot_sl_trends_simple(xref,yref,rads,t,vmin=-4,vmax=8,cmap='jet',TITLE=[],cl
 ## Create gridded SL trend dataset
 ###########################################################################
 ### Create timeseries
-filenames = glob(LOCDIR+'grids4trend/*.nc')
+filenames = glob(LOCDIR+G4T+'*.nc')
 cycle,mission,sla_ucTxA,timeT,xref,yref = create_spatial_timeseries(filenames)
 ### Define map parameters
 xref_mesh,yref_mesh = np.meshgrid(xref,yref)
